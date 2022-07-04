@@ -1,5 +1,5 @@
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script>
+<script type="lazyload2" data-src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script type="lazyload2">
     const DBURL = "https://app.bitespeed.co/database";
     var indexOfwww = location.hostname.indexOf("www");
     var shopDomainStripped = (indexOfwww === -1 ? "." + location.hostname : location.hostname.substr(indexOfwww + 3));
@@ -27,7 +27,7 @@
         });
       return uuid;
     };
-    (function() {
+    setTimeout(function() {
         let refb = String(getCookie("refb"));
         let ssid = String(getCookie("ssid"));
         if(refb === null || refb === '' || refb === undefined || refb === "undefined") {
@@ -37,10 +37,10 @@
             var ssidnew = createSsid();
         }
         
-    })();
+    });
   </script>
   
-  <script>
+  <script type="lazyload2">
     function lookForCart() {
       var myCookie = getCookie("cart");
       if (myCookie) {
@@ -80,7 +80,7 @@
     let intervalId = setInterval(() => {lookForCart()},1000);
   </script>
 
-  <script name="bitespeed-tracking-tag">    
+  <script type="lazyload2" name="bitespeed-tracking-tag">    
     let axiosConfig = {
       headers: {
 	      "Access-Control-Allow-Origin": "*"
@@ -99,7 +99,7 @@
         console.log("AXIOS ERROR: ", err);
         })
     }
-(function(){
+setTimeout(function(){
     var bitespeedLayer = {
         cartPollInterval: 2000
     }
@@ -348,5 +348,5 @@ if(typeof jQuery === 'undefined'){
         }
         return dlRemoved;
     }
-})()
+});
 </script>

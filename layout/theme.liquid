@@ -1,7 +1,16 @@
-<!doctype html>
+<!doctype html> 
 <html class="no-js" lang="{{ request.locale.iso_code }}">
 <head>
-	 {%- if dropinblog == 1 -%}{{ dropinblog_head_top }}{%- endif -%}
+  {% if template contains "index" %}
+	{% render "index-css" %}
+  {% elsif template contains "collection" %}
+	{% render "collection-css" %}
+  {% elsif template contains "product" %}
+	{% render "product-css" %}
+  {% else %}
+	{% render "critical-css-2" %}
+  {% endif %}
+  {%- if dropinblog == 1 -%}{{ dropinblog_head_top }}{%- endif -%}
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -24,11 +33,18 @@
 	{%- else -%}
 		{% include 'social-meta-tags' %}
 	{%- endif -%}
-
-  {%- if tinyscript -%}{{ content_for_header }}{%- else -%}{% render 'tiny-script-control' %}{%- endif -%}
   
-<script
-src="https://www.paypal.com/sdk/js?client-id=AR1RV2HaVGJLKHXciFFs59JxwP-xKhmtS4rweSXAl8dt5u6z6uvq0Jf20a7SMokbMvyCA3lMDLlMDL4F&currency=GBP&components=messages"
+{%- if request.design_mode or template contains 'cart' or template contains 'checkout' -%}
+	<link rel="stylesheet" href="{{ 'theme.scss.css' | asset_url }}">
+	{{ content_for_header }}
+{%- else -%}
+	{% capture content_for_header2 %}{{ content_for_header }}{% endcapture %}
+	{{ content_for_header2 | replace: ' defer="defer" ', ' type="lazyload2" ' | replace: " src=", " data-src=" | replace: "window.addEventListener('load', asyncLoad, false);", "window.addEventListener('wnw_load', asyncLoad, false);" | replace: "DOMContentLoaded", "DOMContentLoaded2" }}
+	<script>var trekkie=[];trekkie.integrations=!0;</script>
+{%- endif -%}
+  
+<script type="lazyload2"
+data-src="https://www.paypal.com/sdk/js?client-id=AR1RV2HaVGJLKHXciFFs59JxwP-xKhmtS4rweSXAl8dt5u6z6uvq0Jf20a7SMokbMvyCA3lMDLlMDL4F&currency=GBP&components=messages"
 data-namespace="PayPalSDK">
 </script>
   <script>
@@ -71,12 +87,12 @@ data-namespace="PayPalSDK">
   {% include 'critical-css' %}
   {% include 'load-css' %}
 
-  <script src="{{ 'vendor-v2.js' | asset_url | split: '?' | first }}" defer="defer"></script>
+  <script defer src="{{ 'vendor-v2.js' | asset_url | split: '?' | first }}"></script>
   {%- if shop.enabled_currencies.size > 1 -%}
-    <link rel="preload" as="style" href="{{ 'currency-flags.css' | asset_url }}" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" data-href="{{ 'currency-flags.css' | asset_url }}">
     <noscript><link rel="stylesheet" href="{{ 'currency-flags.css' | asset_url }}"></noscript>
   {%- endif -%}
-  <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+  <script type="lazyload2"  data-src="{{ 'theme.js' | asset_url }}">
   {%- if request.page_type contains 'customers/' -%}
     <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer="defer"></script>
   {%- endif -%}
@@ -84,12 +100,11 @@ data-namespace="PayPalSDK">
 
   {% render 'shogun-head' %}
 <script>var scaaffCheck = false;</script>
-{{ 'sca_affiliate.js' | asset_url | script_tag }}
+
+<script type="lazyload2" data-src="{{ 'sca_affiliate.js' | asset_url }}"></script>  
 
 
-  
-
-{{ 'crowdfunder.scss.css' | asset_url | stylesheet_tag }}
+<link data-href="{{ 'crowdfunder.scss.css' | asset_url  }}" rel="stylesheet"/>
   
 
 {% include 'grss-json-ld' %}{% render "geo" %}
@@ -97,7 +112,7 @@ data-namespace="PayPalSDK">
   <meta name="google-site-verification" content="SMkLUpYY3DhkUSJn2X1H5s2643nh55o6uWsZwbluuhA" />
   
   	{%- if dropinblog == 1 -%}{{ dropinblog_head_bottom }}{%- endif -%}
-{% include 'hulkcode_common' %}<script src='https://ha-product-option.nyc3.digitaloceanspaces.com/assets/api/v2-beta/hulkcode.js?{{ 'now' | date: '%s'}}' defer='defer'></script></head>
+{% include 'hulkcode_common' %}<script type="lazyload2" data-src='https://ha-product-option.nyc3.digitaloceanspaces.com/assets/api/v2-beta/hulkcode.js?{{ 'now' | date: '%s'}}'></script></head>
 
 
 <body class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% if settings.cart_type == 'sticky' and cart.item_count >
@@ -145,7 +160,7 @@ data-namespace="PayPalSDK">
         {% section 'social' %}
         {% section 'footer' %}
 
-    <script src="//cdn.codeblackbelt.com/js/modules/frequently-bought-together/main.min.js?shop=magentaflowers.myshopify.com" defer></script>
+    <script type="lazyload2" data-src="//cdn.codeblackbelt.com/js/modules/frequently-bought-together/main.min.js?shop=magentaflowers.myshopify.com"></script>
 
     
       </div>
@@ -175,12 +190,13 @@ data-namespace="PayPalSDK">
   {% if settings.cart_type == 'drawer' %}
     {% include 'cart-drawer' %}
   {% endif %}
-{{ '//cdn.shopify.com/s/files/1/0194/1736/6592/t/1/assets/booster-page-speed-optimizer.js?23' | script_tag }}
+
+<script type="lazyload2" data-src="{{ '//cdn.shopify.com/s/files/1/0194/1736/6592/t/1/assets/booster-page-speed-optimizer.js?23' }}"></script>
 {% include 'magisto' %}
 {{'tiny-img-link-preloader.js' | asset_url | script_tag }}
 
       <!-- Call Conversion Tracking Script -->
-    <script src="https://tracker.callconversions.co.uk/js/callconversions-min.js"></script>
+    <script type="lazyload2" data-src="https://tracker.callconversions.co.uk/js/callconversions-min.js"></script>
     <!-- End Call Conversion Tracking Script -->
   
   
@@ -189,6 +205,7 @@ data-namespace="PayPalSDK">
     <!-- **END** Hextom FSB Integration // Main Include - DO NOT MODIFY -->
 <script>window.KlarnaThemeGlobals={};{%case template.name%} {%when"product"%} window.KlarnaThemeGlobals.data_purchase_amount={{product.first_available_variant.price}};window.KlarnaThemeGlobals.productVariants={{product.variants|json}};window.KlarnaThemeGlobals.documentCopy=document.cloneNode(true);{%when"cart"%} window.KlarnaThemeGlobals.data_purchase_amount={{cart.total_price}};window.KlarnaThemeGlobals.documentCopy=document.cloneNode(true);{%endcase%}</script>
 
- <script src="https://t.cometlytrack.com"></script> 
+ <script type="lazyload2" data-src="https://t.cometlytrack.com"></script> 
+ {{ 'wnw-optimization.js' | asset_url | script_tag }}
   </body>
 </html>

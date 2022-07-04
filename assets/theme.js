@@ -36,15 +36,18 @@ lazySizesConfig.expFactor = 4;
     promiseStylesheet: function() {
       if (typeof this.stylesheetPromise === 'undefined') {
         this.stylesheetPromise = $.Deferred(function(defer) {
-          var link = document.querySelector('link[href="' + theme.stylesheet + '"]');
+          var link = document.querySelector('.loadCSS');
   
-          if (link.loaded) {
+            defer.resolve();
+		if (link.loaded) {
             defer.resolve();
           }
   
+/*
           onloadCSS(link, function() { // Global onloadCSS function injected by load-css.liquid
             defer.resolve();
           });
+*/
         });
       }
   
