@@ -1,0 +1,297 @@
+<!-- SEO, JSON‑LD, Schema --> 
+ 
+        {% assign grss_how_to = product.metafields.instructions.grss_how_to %}
+        {{grss_how_to}}
+
+        {% assign grss_faq = product.metafields.instructions.grss_faq %}
+        {{grss_faq}}
+        {% comment %} startBreadcrumbGrss {% endcomment %}
+{% if template.name == "collection" %}
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	"itemListElement": [{
+		"@type": "ListItem",
+		"position": 1,
+		"name": "{{shop.name}}",
+		"item": "{{ shop.url }}"
+		},{
+		"@type": "ListItem",
+		"position": 2,
+		"name": "{{collection.title | strip_html | escape}}",
+		"item": "{{ shop.url }}{{collection.url}}"
+	}]
+}
+</script>
+{% endif %}
+{% if template.name == "product" and  collection.title != blank %}
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	"itemListElement": [{
+		"@type": "ListItem",
+		"position": 1,
+		"name": "{{shop.name}}",
+		"item": "{{ shop.url }}"
+		},
+{
+	"@type": "ListItem",
+	"position": 2,
+		"name": "{{collection.title}}",
+		"item": "{{ shop.url }}{{collection.url}}"
+	},
+{
+		"@type": "ListItem",
+		"position": 3,
+		"name": "{{product.title | strip_html | escape}}",
+		"item": "{{ shop.url }}{{collection.url}}{{product.url}}"
+	}]
+}
+</script>
+{% endif %}
+{% if template.name == "product" and  collection.title == blank %}
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	"itemListElement": [{
+		"@type": "ListItem",
+		"position": 1,
+		"name": "{{shop.name}}",
+		"item": "{{ shop.url }}"
+		},
+{
+		"@type": "ListItem",
+		"position": 2,
+		"name": "{{product.title | strip_html | escape}}",
+		"item": "{{ shop.url }}{{product.url}}"
+	}]
+}
+</script>
+{% endif %}
+{% comment %} endBreadcrumbGrss {% endcomment %}
+{% comment %} startCarouselGrss {% endcomment %}
+{% if template.name == "collection" %}
+<script type="application/ld+json">
+{
+	 "@context":"https://schema.org",
+	 "@type":"ItemList",
+	"itemListElement":[
+	{% for product in collection.products %}
+	{
+		"@type":"ListItem",
+		"position":{{ forloop.index }},
+		"url":"{{shop.domain | append: "/products/" | append: product.handle }}",
+		"description":{{product.description | strip_html | escape | json | row }}
+,		"image": "{{ product.featured_image.src | img_url: "master" }}",
+		"name": "{{product.title | strip_html | escape}}"
+	}
+	{%- unless forloop.last -%},{%- endunless -%}
+	{% endfor %}
+	]
+}
+</script>
+{% endif %}
+{% comment %} endCarouselGrss {% endcomment %}
+{% comment %} startSearchGrss {% endcomment %}
+<script type="application/ld+json">
+{
+ 	"@context": "https://schema.org",
+ 	"@type": "WebSite",
+ 	"url": "{{ shop.url }}",
+ 	"potentialAction": {
+ 	 	"@type": "SearchAction",
+ 	 	 "target": "https://magentaflowers.co.uk/search?q={search_term}",
+ 	 	"query-input": "required name=search_term"
+ 	}
+}
+</script>
+{% comment %} endSearchGrss {% endcomment %}
+
+{% comment %} startArticleGrss {% endcomment %}
+{% if template.name == "article" %}
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "Article",
+	"mainEntityOfPage": {
+	"@type": "WebPage",
+	"@id": "{{ shop.url }}{{ article.url }}"
+	},
+	"headline": "{{article.title | strip_html | escape}}",
+	"image": [
+	"{{article.image.src | img_url: 'large'}}"
+	],
+	"datePublished": "{{article.published_at}}",
+	"author": {
+		"@type": "Person",
+		"name": "Adam Riyadh",
+		"url": "http://{{shop.domain}}" 
+	},
+	"publisher": {
+		"@type": "Organization",
+		"name": "Magenta Flowers",
+		"logo": {
+			"@type": "ImageObject",
+			"url": "https://cdn.shopify.com/s/files/1/0141/2644/8726/files/Magenta_2.png?v=1565372467"
+		}
+	},
+	"description": "{{page_description | default: shop.description | strip_html | escape}}",
+	"dateModified": "{{ article.updated_at }}"}
+</script>
+{% endif %}
+{% comment %} endArticleGrss {% endcomment %}
+
+{% comment %} startProductGrss {% endcomment %} 
+{% if template.name == "product" %}
+{% assign fa_current_variant = product.selected_or_first_available_variant %}
+<script type="application/ld+json" id="grss_product">
+{
+	"@context": "http://schema.org/",
+	"@type": "Product",
+	"url": "{{ shop.url | append: "/products/" | append: product.handle }}",
+	"name": "{{ product.title | escape}}",
+	"image": "{{ product.featured_image.src | img_url: "master" }}",
+	"description": "{{ page_description | escape }}",
+			{%- if fa_current_variant.sku != blank -%}
+			"sku": "{{ fa_current_variant.sku }}",
+			{%- else -%}
+			"sku": "{{ fa_current_variant.id }}",
+			{%- endif -%}
+	{%- if product.selected_or_first_available_variant.mpn -%}
+	"mpn": "{{ product.selected_or_first_available_variant.mpn }}",
+			{%- else -%}
+	"mpn": "{{ product.selected_or_first_available_variant.sku }}",
+			{%- endif -%}
+	"brand": {
+		"@type": "Brand",
+		"name": "{{ product.vendor | strip_html | escape}}"
+	},
+	{%- assign review_count = product.metafields.judgeme.badge | split: "data-number-of-reviews='" | last | split: "'" |first | plus: 0 -%}
+	 {%- assign review_value = product.metafields.judgeme.badge | split: "data-average-rating='" | last | split: "'" |first | plus: 0 -%}
+	{% if review_count > 0 %}
+	"aggregateRating":{
+		"@type":"AggregateRating",
+		"ratingValue": {{ review_value }},
+		"reviewCount": {{ review_count }}
+	}, 
+	 "review": {
+                "@type": "Review",
+                 "name": "{{product.title | escape}}",
+                  "author": {
+                      "@type": "Person",
+                    "name": "Christine Sewell"
+                   },
+                   "reviewBody": "Excellent"
+            },
+	 {% endif %}
+	"offers": {% if product.variants.size > 1 %}[{% endif %}
+		{%- for variant in product.variants -%}
+		{
+			"@type" : "Offer",
+			"priceCurrency": "{{ cart.currency.iso_code }}",
+			"price": "{{ variant.price | money_without_currency  | strip_html | remove: ',' }}",
+			"itemCondition" : "http://schema.org/NewCondition",
+			"availability" : "http://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+			"url" : "{{ shop.url }}{{ variant.url }}",
+			{%- if variant.image -%}
+			{% assign variant_image_size = variant.image.width | append: 'x' %}
+			"image": "http:{{ variant.image.src | img_url: variant_image_size }}",
+			{%- else -%}
+			"image": "https:{{ product.featured_image.src | img_url: 'grande' }}",
+			{%- endif -%}
+			{%- if variant.title != 'Default Title' -%}
+			"name" : "{{ product.title | strip_html | escape }} - {{ variant.title | escape }}",
+			{%- else -%}
+			"name" : "{{ product.title | strip_html | escape }}",
+			{%- endif -%}
+			 "gtin": "{{product.selected_or_first_available_variant.barcode}}",
+			{%- if variant.barcode.size == 8 -%}
+			"gtin8": "{{ variant.barcode }}",
+			{%- endif -%}
+			{%- if variant.barcode.size == 12 -%}
+			"gtin12": "{{ variant.barcode }}",
+			{%- endif -%}
+			{%- if variant.barcode.size == 13 -%}
+			"gtin13": "{{ variant.barcode }}",
+			{%- endif -%}
+			{%- if variant.barcode.size == 14 -%}
+			"gtin14": "{{ variant.barcode }}",
+			{%- endif -%}
+			{%- if variant.sku != blank -%}
+			"sku": "{{ variant.sku }}",
+			{%- else -%}
+			"sku": "{{ variant.id }}",
+			{%- endif -%}
+			{%- if product.description != blank -%}
+			"description" : {{ product.description | strip_html | json }},
+			{%- endif -%}
+			"priceValidUntil": "{{ 'now' | date: '%s' | plus: 2592000 | date: '%Y-%m-%d' | uri_encode | replace:'+','%20' }}"
+		}
+		{%- unless forloop.last -%},{%- endunless -%}
+		{%- endfor -%}
+		{%- if product.variants.size > 1 -%}]
+		 {%- endif -%}
+}
+</script>
+
+
+
+
+{% endif %}
+{% comment %} endProductGrss {% endcomment %}
+
+{% comment %} startLocalBusinessGrss {% endcomment %}
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "JewelryStore",
+	"image": ["https://cdn.shopify.com/s/files/1/0141/2644/8726/files/Magenta_2_180x.png?v=1565372467","https://cdn.shopify.com/s/files/1/0141/2644/8726/files/Magenta_2_180x.png?v=1565372467"],
+	"@id": "http://{{shop.domain}}",
+	"name": "Magenta Flowers",
+	"address": {
+		"@type": "PostalAddress",
+		"addressLocality": "Bexley",
+		"addressRegion": "London",
+		"postalCode": "DA51EQ",
+		"streetAddress": "14 ArbuthnotLane"
+	},
+	"geo": {
+		"@type": "GeoCoordinates",
+		"latitude": {{ shop.latitude | json }},
+		"longitude": {{ shop.longitude | json }}
+	},
+	"servesCuisine": "",
+	"priceRange": "10 -  GBP",
+	"openingHoursSpecification": [{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday"," Tuesday "," Wednesday"," Thursday"," Friday"],"opens":"09:00","closes":"21:00"}],
+	"telephone": "07857971648"
+}
+</script>
+{% comment %} endLocalBusinessGrss {% endcomment %}
+
+{% comment %} startLogoGrss {% endcomment %} 
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "Organization",
+	"name": "Magenta Flowers",
+	"url": "magentaflowers.co.uk",
+	"description": "Magenta Flowers are an award-winning wedding flower preservation company located in Bexley, Kent in the south east of England. The team of resin artists are passionate about providing clients with expertly crafted and uniquely customised keepsakes. They create beautiful handmade mementoes out of wedding bouquets, funeral flowers or any other flowers. Your expensive bouquet can be preserved into an incredible piece of art that you can cherish for years to come.",
+	"telephone": "07857971648",
+	"logo": "https://cdn.shopify.com/s/files/1/0141/2644/8726/files/Magenta_2_180x.png?",
+	"image": "https://cdn.shopify.com/s/files/1/0141/2644/8726/files/Magenta_2_180x.png?",
+	"sameAs": ["https://www.facebook.com/MagentaFlowersUK","https://www.instagram.com/magentaflowersuk/"],
+	"address": {
+		"@type": "PostalAddress",
+		"streetAddress": "14 Arbuthnot Lane",
+		"addressLocality": "Bexley",
+		"addressRegion": "London",
+		"postalCode": "DA51EQ",
+		"addressCountry": "United Kingdom" 
+	}
+}
+</script>
+{% comment %} endLogoGrss {% endcomment %}
+

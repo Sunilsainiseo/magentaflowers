@@ -1,0 +1,10 @@
+{% comment %}
+  Your home page is build up of sections, the code for each living in
+  the sections/ director.
+{% endcomment %}
+
+<div class="sections-wrapper">
+  {{ content_for_index }}
+</div>
+
+{% include 'judgeme_widgets', widget_type: 'judgeme_featured_carousel', concierge_install: true, auto_install: true %}
